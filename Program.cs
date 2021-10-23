@@ -53,6 +53,7 @@ namespace ArenaFighter
             {
                 Battle.Play(player.Name, opponent.Name);
             }
+
             Console.ReadKey();
         }
 
@@ -119,9 +120,6 @@ namespace ArenaFighter
                 string createText = "Arena Fighter - Game results" + Environment.NewLine + Environment.NewLine + "Datum:\t\t Spelare:\t Motståndare:\t\t Vinnare:\t Antal ronder:\t\t ";
                 File.WriteAllText(path, createText);
             }
-
-            // This text is always added, making the file longer over time
-            // if it is not deleted.
             string appendText = saveToLog + Environment.NewLine;
             File.AppendAllText(path, appendText);
         }
@@ -257,14 +255,14 @@ namespace ArenaFighter
                     int toSpend = Reward;
                     if (toSpend >= 10)
                     {
-                        Reward = toSpend - 10;
+                        Reward = Reward - 10;
                         Console.Write("\r\nStyrka är uppgraderad ");
                     }
                     else
                     {
                         Console.WriteLine($"\n--Medges EJ-- \nDu har endast {Reward} gamecoins kvar att spendera, spela mer för o vinna fler");
                     }
-                    
+
                     Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
                     Console.ReadKey();
                     Program.MainMenu();
@@ -280,7 +278,7 @@ namespace ArenaFighter
                     Console.WriteLine($"\n Du har {Reward} gamecoins kvar att spendera");
                     Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
                     Console.ReadKey();
-                    Program.MainMenu(); 
+                    Program.MainMenu();
 
                 }
             }
