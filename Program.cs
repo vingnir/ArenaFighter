@@ -5,7 +5,7 @@ namespace ArenaFighter
 {
     class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             bool showMenu = true;
             while (showMenu)
@@ -13,8 +13,11 @@ namespace ArenaFighter
                 showMenu = MainMenu();
             }
         }
-        public static Character player = new Character();
-        public static Character opponent = new Character();
+        public static Character player = new();
+        private static Character opponent = new();
+
+        public static Character Opponent { get => opponent; set => opponent = value; }
+
         // Huvudmeny
         public static bool MainMenu()
         {
@@ -45,22 +48,25 @@ namespace ArenaFighter
             Console.WriteLine("\n --- Arena Fighter --");
             Console.WriteLine("\nSkriv in namnet på din karaktär och tryck enter");
             player.Name = Console.ReadLine();
-            opponent.Name = CreateOpponent();
+            Opponent.Name = CreateOpponent();
             Console.WriteLine($"\nDin karaktär heter {player.Name} \noch besitter följande egenskaper: \nStyrka: {player.Strength} \nHälsa: {player.Health} ");
             Console.WriteLine("\n\nTryck på 'p' för att spela");
-            string usrInput = Console.ReadLine();
-            if (usrInput == "p")
+            switch (Console.ReadLine())
             {
-                Battle.Play(player.Name, opponent.Name);
+                case "p":
+                    Battle.Play(player.Name, Opponent.Name);
+                    break;
+                default:
+                    MainMenu();
+                    break;
             }
-
-            Console.ReadKey();
         }
+        
 
         // Metod för att generera ett slupmässigt nummer mellan 1-10
         public static int GetRandomNumber()
         {
-            Random rand = new Random();
+            Random rand = new();
             int x = rand.Next(1, 10);
             int randomNum = x;
             return randomNum;
@@ -68,21 +74,20 @@ namespace ArenaFighter
 
         public static string CreateOpponent()
         {
-            int index = 0;
-            opponent.Health = GetRandomNumber();
-            opponent.Strength = GetRandomNumber();
+            Opponent.Health = GetRandomNumber();
+            Opponent.Strength = GetRandomNumber();
 
             // Skapar array med namn på motståndare
             string[] opponents = new string[] { "Evil Queen", "Queen of Hearts", "Captain Hook", "---- Maleficent ----", "Cruella de Vil", "--- Scar ---", "Doctor Facilier", "--- Hades ---", "--- Jafar ---" };
 
             // Skapar ett Random object  
-            Random rand = new Random();
+            Random rand = new();
 
             // Genererar ett random index   
-            index = rand.Next(opponents.Length);
-            opponent.Name = opponents[index];
-            Console.WriteLine($"\nDin motståndare heter {opponent.Name} \noch besitter följande egenskaper: \nStyrka: {opponent.Strength} \nHälsa: {opponent.Health} ");
-            return opponent.Name;
+            int index = rand.Next(opponents.Length);
+            Opponent.Name = opponents[index];
+            Console.WriteLine($"\nDin motståndare heter {Opponent.Name} \noch besitter följande egenskaper: \nStyrka: {Opponent.Strength} \nHälsa: {Opponent.Health} ");
+            return Opponent.Name;
         }
     }
 
@@ -97,8 +102,12 @@ namespace ArenaFighter
 
     public class Battle
     {
-        public static string Player;
-        public static string Opponent;
+        private static string player;
+        private static string opponent;
+
+        public static string Player { get => player; set => player = value; }
+        public static string Opponent { get => opponent; set => opponent = value; }
+
         public static void Play(string usr, string cpu)
         {
             Player = usr;
@@ -127,11 +136,15 @@ namespace ArenaFighter
 
     public class Round
     {
-        public static int Counter;
-        public static int Reward;
+        private static int counter;
+        private static int reward;
+
+        public static int Counter { get => counter; set => counter = value; }
+        public static int Reward { get => reward; set => reward = value; }
+
         public static int RollDice()
         {
-            Random dice = new Random();
+            Random dice = new();
             int x = dice.Next(1, 6);
             int randomDice = x;
             return randomDice;
@@ -187,7 +200,7 @@ namespace ArenaFighter
             else if (usrInput == "r" && lifeStatus)
             {
                 Console.WriteLine("\n");
-                Reward = Reward + Counter;
+                Reward += Counter;
                 Console.WriteLine($"\n You have choosed to retire, this earns you: {Reward} gamecoin");
 
                 // Opens file with results.
@@ -216,71 +229,71 @@ namespace ArenaFighter
                 Console.ReadKey();
                 Program.MainMenu();
             }
+        }
 
-            static void Shop()
+        private static void Shop()
+        {
+            bool showShop = true;
+            while (showShop)
             {
-                bool showShop = true;
-                while (showShop)
+                showShop = ShopMenu();
+            }
+
+            bool ShopMenu()
+            {
+                Console.Clear();
+                Console.WriteLine("--- SHOP --- \n");
+                Console.WriteLine("1) Styrka 10 gamecoins");
+                Console.WriteLine("2) Hälsa 1 gamecoin");
+                Console.WriteLine("0) Avsluta");
+                Console.Write("\r\nVälj uppgradering: ");
+                Console.WriteLine($"\n Du har {Reward} gamecoins att spendera");
+
+                switch (Console.ReadLine())
                 {
-                    showShop = ShopMenu();
+                    case "0":
+                        Program.MainMenu();
+                        return false;
+                    case "1":
+                        BuyStrength();
+                        return true;
+                    case "2":
+                        BuyHealth();
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+            void BuyStrength()
+            {
+                int toSpend = Reward;
+                if (toSpend >= 10)
+                {
+                    Reward -= 10;
+                    Console.Write("\r\nStyrka är uppgraderad ");
+                }
+                else
+                {
+                    Console.WriteLine($"\n--Medges EJ-- \nDu har endast {Reward} gamecoins kvar att spendera, spela mer för o vinna fler");
                 }
 
-                static bool ShopMenu()
+                Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
+                Console.ReadKey();
+                Program.MainMenu();
+            }
+            void BuyHealth()
+            {
+                int budget = Reward;
+                if (budget >= 1)
                 {
-                    Console.Clear();
-                    Console.WriteLine("--- SHOP --- \n");
-                    Console.WriteLine("1) Styrka 10 gamecoins");
-                    Console.WriteLine("2) Hälsa 1 gamecoin");
-                    Console.WriteLine("0) Avsluta");
-                    Console.Write("\r\nVälj uppgradering: ");
-                    Console.WriteLine($"\n Du har {Reward} gamecoins att spendera");
-
-                    switch (Console.ReadLine())
-                    {
-                        case "0":
-                            Program.MainMenu();
-                            return false;
-                        case "1":
-                            BuyStrength();
-                            return true;
-                        case "2":
-                            BuyHealth();
-                            return true;
-                        default:
-                            return true;
-                    }
+                    Reward = budget - 1;
+                    Console.Write("\r\nHälsa är uppgraderad ");
                 }
-                static void BuyStrength()
-                {
-                    int toSpend = Reward;
-                    if (toSpend >= 10)
-                    {
-                        Reward = Reward - 10;
-                        Console.Write("\r\nStyrka är uppgraderad ");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"\n--Medges EJ-- \nDu har endast {Reward} gamecoins kvar att spendera, spela mer för o vinna fler");
-                    }
+                Console.WriteLine($"\n Du har {Reward} gamecoins kvar att spendera");
+                Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
+                Console.ReadKey();
+                Program.MainMenu();
 
-                    Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
-                    Console.ReadKey();
-                    Program.MainMenu();
-                }
-                static void BuyHealth()
-                {
-                    int budget = Reward;
-                    if (budget >= 1)
-                    {
-                        Reward = budget - 1;
-                        Console.Write("\r\nHälsa är uppgraderad ");
-                    }
-                    Console.WriteLine($"\n Du har {Reward} gamecoins kvar att spendera");
-                    Console.WriteLine("\nTryck på enter för att återgå till huvudmenyn");
-                    Console.ReadKey();
-                    Program.MainMenu();
-
-                }
             }
         }
 
